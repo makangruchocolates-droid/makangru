@@ -1,0 +1,28 @@
+@import 'tailwindcss';
+
+:root {
+  --obsidian:#02000A; --cosmos:#06020F; --void:#0A061A; --nebula:#140A2A;
+  --amber:#C8860A; --gold:#E8B84B; --starlight:#F5E6C8; --cream:#FDF6E8;
+  --stellar:#A89070; --rose:#D4726A; --teal:#4A9B8E;
+  --font-display:var(--font-cinzel),Georgia,serif;
+  --font-body:var(--font-cormorant),Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--obsidian);color:var(--starlight);font-family:var(--font-body);-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--cosmos)}::-webkit-scrollbar-thumb{background:var(--amber);border-radius:2px}
+::selection{background:var(--amber);color:var(--obsidian)}
+input,textarea,select{font-family:var(--font-body)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes rspin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes sigpulse{0%,100%{opacity:.15;transform:scale(1)}50%{opacity:.55;transform:scale(1.12)}}
+@keyframes pfade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+.animate-fade-up{animation:fadeUp .7s ease both}
+.animate-float{animation:float 4s ease-in-out infinite}
+.animate-spin-slow{animation:spin .8s linear infinite}
+.page-fade{animation:pfade .55s ease both}
