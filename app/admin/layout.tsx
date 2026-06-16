@@ -5,24 +5,29 @@ import { usePathname } from 'next/navigation'
 const NAV = [
   { href:'/admin', label:'Dashboard', icon:'◈', exact:true },
   { href:'/admin/productos', label:'Productos', icon:'✦' },
+  { href:'/admin/destacados', label:'Destacados', icon:'⭐' },
   { href:'/admin/categorias', label:'Categorías', icon:'◇' },
   { href:'/admin/pedidos', label:'Pedidos', icon:'▣' },
   { href:'/admin/clientes', label:'Clientes', icon:'◉' },
   { href:'/admin/cupones', label:'Cupones', icon:'❋' },
   { href:'/admin/envios', label:'Zonas de Envío', icon:'◎' },
   { href:'/admin/entregas', label:'Días de Entrega', icon:'✧' },
+  { href:'/admin/blog', label:'Blog', icon:'✒' },
+  { href:'/admin/mensajes', label:'Mensajes', icon:'✉' },
+  { href:'/admin/metricas', label:'Métricas', icon:'▲' },
+  { href:'/admin/ajustes', label:'Ajustes', icon:'⚙' },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const p = usePathname()
   return (
     <div style={{ display:'flex', minHeight:'100vh', background:'#02000A' }}>
-      <aside style={{ width:240, background:'rgba(6,3,14,0.98)', borderRight:'1px solid rgba(200,134,10,0.15)', display:'flex', flexDirection:'column', position:'fixed', top:0, bottom:0, left:0, zIndex:50 }}>
+      <aside style={{ width:240, background:'rgba(6,3,14,0.98)', borderRight:'1px solid rgba(200,134,10,0.15)', display:'flex', flexDirection:'column', position:'fixed', top:0, bottom:0, left:0, zIndex:50, overflowY:'auto' }}>
         <div style={{ padding:'22px 20px 18px', borderBottom:'1px solid rgba(200,134,10,0.15)' }}>
           <div style={{ fontFamily:'Cinzel,Georgia,serif', fontSize:17, fontWeight:700, color:'#E8B84B', letterSpacing:3 }}>MAKANGRU</div>
           <div style={{ fontSize:8, color:'#A89070', letterSpacing:2, textTransform:'uppercase', marginTop:4 }}>Panel Administrativo</div>
         </div>
-        <nav style={{ flex:1, padding:'10px 0', overflowY:'auto' }}>
+        <nav style={{ flex:1, padding:'10px 0' }}>
           {NAV.map(item => {
             const active = item.exact ? p === item.href : p.startsWith(item.href)
             return (
