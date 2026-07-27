@@ -29,7 +29,6 @@ const DEFAULTS = {
   whatsapp_number: '',
   whatsapp_message: 'Hola MAKANGRU ✦ me gustaría hacer un pedido',
   mp_public_key: '',
-  mp_access_token: '',
   // Banners
   banner_enabled: false,
   banner_text: '',
@@ -199,10 +198,8 @@ export default function AjustesPage() {
             <div style={{ background: 'rgba(139,124,248,0.08)', border: '1px solid rgba(139,124,248,0.2)', padding: '10px 14px', marginBottom: 18, fontFamily: 'Georgia,serif', fontSize: 12, color: '#8B7CF8' }}>
               ⚠ Las credenciales de MercadoPago deben configurarse en variables de entorno de Vercel para producción. Estos campos son solo de referencia / staging.
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              <div style={G}><label style={L}>Public Key</label><input style={I} value={form.mp_public_key} onChange={e => set('mp_public_key', e.target.value)} placeholder="APP_USR-..." /></div>
-              <div style={G}><label style={L}>Access Token</label><input style={{ ...I, fontFamily: 'monospace' }} value={form.mp_access_token} onChange={e => set('mp_access_token', e.target.value)} placeholder="APP_USR-..." type="password" /></div>
-            </div>
+            <div style={G}><label style={L}>Public Key (opcional)</label><input style={I} value={form.mp_public_key} onChange={e => set('mp_public_key', e.target.value)} placeholder="APP_USR-..." /></div>
+            <p style={{ color:'#A89070', fontFamily:'Georgia,serif', fontSize:12 }}>El Access Token nunca se guarda ni se muestra aquí. Debe existir únicamente como <code>MP_ACCESS_TOKEN</code> cifrado en Vercel.</p>
           </div>
         </div>
       )}

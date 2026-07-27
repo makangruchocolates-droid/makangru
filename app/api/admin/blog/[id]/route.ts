@@ -1,7 +1,10 @@
+import { requireAdminApi } from '@/lib/auth/admin'
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const unauthorized = await requireAdminApi()
+  if (unauthorized) return unauthorized
   const { id } = await params
   const db = createAdminClient()
   const { data, error } = await db.from('blog_posts').select('*').eq('id', id).single()
@@ -10,6 +13,8 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const unauthorized = await requireAdminApi()
+  if (unauthorized) return unauthorized
   const { id } = await params
   const db = createAdminClient()
   const body = await req.json()
@@ -19,6 +24,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const unauthorized = await requireAdminApi()
+  if (unauthorized) return unauthorized
   const { id } = await params
   const db = createAdminClient()
   const { error } = await db.from('blog_posts').delete().eq('id', id)

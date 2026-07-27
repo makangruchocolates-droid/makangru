@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { calculateFallbackDates } from '@/lib/commerce/catalog'
 export async function GET() {
   const supabase = await createClient()
   const [{ data: settings }, { data: blocked }] = await Promise.all([
     supabase.from('delivery_settings').select('*').single(),
     supabase.from('blocked_delivery_dates').select('date').gte('date', new Date().toISOString().split('T')[0]),
   ])
-  if (!settings) return NextResponse.json({ dates: [] })
+  if (!settings) return NextResponse.json({ dates: calculateFallbackDates(), message: 'Elige tu fecha de entrega preferida ✦' })
   const blockedSet = new Set((blocked || []).map((b: any) => b.date))
   const now = new Date()
   const extra = now.getHours() >= (settings.cutoff_hour || 12) ? 1 : 0

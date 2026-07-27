@@ -1,12 +1,17 @@
+import { requireAdminApi } from '@/lib/auth/admin'
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 export async function GET() {
+  const unauthorized = await requireAdminApi()
+  if (unauthorized) return unauthorized
   const db = createAdminClient()
   const { data, error } = await db.from('delivery_settings').select('*').single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ data })
 }
 export async function PUT(req: NextRequest) {
+  const unauthorized = await requireAdminApi()
+  if (unauthorized) return unauthorized
   const db = createAdminClient(); const body = await req.json()
   const { data: ex } = await db.from('delivery_settings').select('id').single()
   const result = ex

@@ -1,6 +1,9 @@
+import { requireAdminApi } from '@/lib/auth/admin'
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const unauthorized = await requireAdminApi()
+  if (unauthorized) return unauthorized
   const { id } = await params
   const db = createAdminClient()
   const { data, error } = await db.from('recipes').select('*, product:products(name), recipe_ingredients(*, ingredient:ingredients(name,unit,cost_per_unit))').eq('id', id).single()
@@ -8,6 +11,8 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
   return NextResponse.json({ data })
 }
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const unauthorized = await requireAdminApi()
+  if (unauthorized) return unauthorized
   const { id } = await params
   const db = createAdminClient()
   const body = await req.json()
@@ -21,6 +26,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   return NextResponse.json({ data })
 }
 export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const unauthorized = await requireAdminApi()
+  if (unauthorized) return unauthorized
   const { id } = await params
   const db = createAdminClient()
   await db.from('recipe_ingredients').delete().eq('recipe_id', id)

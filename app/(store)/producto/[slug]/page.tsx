@@ -4,6 +4,7 @@ import { fallbackGradient, firstImage } from '@/lib/productVisual'
 import { notFound } from 'next/navigation'
 import AddToCartBtn from './AddToCartButton'
 import { WhatsappConsultLink } from './WhatsappConsultLink'
+import { fallbackProductBySlug, fallbackProductForDatabase } from '@/lib/commerce/catalog'
 
 function Sphere({ g }: { g:string }) {
   return (
@@ -24,7 +25,9 @@ async function getProduct(slug: string) {
     .eq('slug', slug)
     .eq('is_active', true)
     .single()
-  return data
+  if (data) return data
+  const fallback = fallbackProductBySlug(slug)
+  return fallback ? fallbackProductForDatabase(fallback) : null
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {

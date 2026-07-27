@@ -250,7 +250,6 @@ function Header({ onCartOpen }: { onCartOpen:()=>void }) {
             {n.l}
           </Link>
         ))}
-        <Link href="/admin" style={{fontFamily:'var(--font-body)',fontSize:12,letterSpacing:2,textTransform:'uppercase',textDecoration:'none',color:'var(--stellar)',border:'1px solid rgba(200,134,10,0.28)',padding:'4px 12px',transition:'all .2s'}}>Admin</Link>
       </nav>
       <button onClick={onCartOpen} style={{background:'none',border:'none',color:'var(--starlight)',cursor:'pointer',padding:8,fontSize:18,position:'relative'}}>
         🛒

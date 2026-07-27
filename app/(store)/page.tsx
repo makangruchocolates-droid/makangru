@@ -4,6 +4,8 @@ import { fmt } from '@/lib/utils'
 import { fallbackGradient, firstImage } from '@/lib/productVisual'
 import { TrackedLink } from '@/components/store/TrackedLink'
 import AddToCartBtn from './AddToCartBtn'
+import { PRODUCTS } from '@/lib/products'
+import { fallbackProductForDatabase } from '@/lib/commerce/catalog'
 
 function Sphere({ gradient, size=110 }: { gradient:string; size?:number }) {
   return (
@@ -26,7 +28,11 @@ async function getFeatured() {
     .or('is_featured.eq.true,is_new.eq.true')
     .order('created_at', { ascending: false })
     .limit(4)
-  return data || []
+  if (data?.length) return data
+  return PRODUCTS
+    .filter(product => product.isNew || product.isSale)
+    .slice(0, 4)
+    .map(fallbackProductForDatabase)
 }
 
 export default async function HomePage() {
@@ -156,7 +162,6 @@ export default async function HomePage() {
             <div>
               <p style={{ fontFamily:'var(--font-body)', fontSize:9, letterSpacing:3, color:'var(--amber)', textTransform:'uppercase', marginBottom:12 }}>Atelier</p>
               <Link href="/contacto" style={{ display:'block', fontFamily:'var(--font-body)', fontSize:13, color:'var(--stellar)', marginBottom:9, textDecoration:'none' }}>Contacto</Link>
-              <Link href="/admin" style={{ display:'block', fontFamily:'var(--font-body)', fontSize:13, color:'var(--stellar)', marginBottom:9, textDecoration:'none' }}>Panel Admin</Link>
             </div>
             <div>
               <p style={{ fontFamily:'var(--font-body)', fontSize:9, letterSpacing:3, color:'var(--amber)', textTransform:'uppercase', marginBottom:12 }}>Contacto</p>

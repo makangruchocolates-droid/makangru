@@ -81,11 +81,9 @@ export function Analytics() {
         </noscript>
       )}
 
-      {(GA_ID || META_PIXEL_ID) && (
-        <Suspense fallback={null}>
-          <RouteChangeTracker />
-        </Suspense>
-      )}
+      <Suspense fallback={null}>
+        <RouteChangeTracker />
+      </Suspense>
     </>
   );
 }

@@ -1,3 +1,4 @@
+import { requireAdminApi } from '@/lib/auth/admin'
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 
@@ -9,6 +10,8 @@ const EVENT_LABELS: Record<string, string> = {
 }
 
 export async function GET() {
+  const unauthorized = await requireAdminApi()
+  if (unauthorized) return unauthorized
   const db = createAdminClient()
   const since = new Date()
   since.setDate(since.getDate() - 30)

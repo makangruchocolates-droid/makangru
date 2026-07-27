@@ -1,10 +1,10 @@
 import { MercadoPagoConfig, Preference, Payment } from 'mercadopago'
 export const mp = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN! })
 
-export async function createPreference({ items, customer, orderId, discount=0 }: any) {
+export async function createPreference({ customer, orderId, total }: any) {
   const pref = new Preference(mp)
   return pref.create({ body: {
-    items: items.map((i:any)=>({ id:i.product_id, title:i.name, unit_price:Number(i.price), quantity:i.quantity, currency_id:'CLP' })),
+    items: [{ id:orderId, title:'Pedido MAKANGRU', unit_price:Number(total), quantity:1, currency_id:'CLP' }],
     payer: { name:customer.first_name, surname:customer.last_name, email:customer.email },
     back_urls: {
       success:`${process.env.NEXT_PUBLIC_APP_URL}/checkout/success`,
