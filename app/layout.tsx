@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Cinzel, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
+import { Analytics } from '@/components/store/Analytics'
 
 const cinzel = Cinzel({ subsets:['latin'], variable:'--font-cinzel', display:'swap', weight:['400','600','700'] })
 const cormorant = Cormorant_Garamond({ subsets:['latin'], variable:'--font-cormorant', weight:['300','400','500','600'], style:['normal','italic'], display:'swap' })
@@ -15,7 +16,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }:{ children:React.ReactNode }) {
   return (
     <html lang="es" className={`${cinzel.variable} ${cormorant.variable}`}>
-      <body>{children}</body>
+      <body>
+        <Analytics />
+        {children}
+      </body>
     </html>
   )
 }

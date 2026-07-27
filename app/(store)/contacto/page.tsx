@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { trackEvent } from '@/lib/analytics'
 export default function ContactoPage() {
   const [form, setForm] = useState({ name:'', email:'', phone:'', subject:'', message:'' })
   const [sent, setSent] = useState(false)
@@ -30,7 +31,7 @@ export default function ContactoPage() {
               </div>
             </div>
           ))}
-          <a href="https://wa.me/56951975639" target="_blank" rel="noopener noreferrer" style={{ display:'inline-flex', alignItems:'center', gap:10, marginTop:16, padding:'13px 24px', background:'rgba(37,211,102,.08)', border:'1px solid rgba(37,211,102,.3)', color:'#25D366', textDecoration:'none', fontFamily:'var(--font-body)', fontSize:13, letterSpacing:2 }}>💬 Escribirnos por WhatsApp</a>
+          <a href="https://wa.me/56951975639" target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('click_pedir_whatsapp', { origen: 'pagina_contacto' })} style={{ display:'inline-flex', alignItems:'center', gap:10, marginTop:16, padding:'13px 24px', background:'rgba(37,211,102,.08)', border:'1px solid rgba(37,211,102,.3)', color:'#25D366', textDecoration:'none', fontFamily:'var(--font-body)', fontSize:13, letterSpacing:2 }}>💬 Escribirnos por WhatsApp</a>
         </div>
         <div>
           {sent ? (

@@ -1,7 +1,8 @@
-'use client'
 import Link from 'next/link'
-import { PRODUCTS } from '@/lib/products'
+import { createAdminClient } from '@/lib/supabase/server'
 import { fmt } from '@/lib/utils'
+import { fallbackGradient, firstImage } from '@/lib/productVisual'
+import { TrackedLink } from '@/components/store/TrackedLink'
 import AddToCartBtn from './AddToCartBtn'
 
 function Sphere({ gradient, size=110 }: { gradient:string; size?:number }) {
@@ -16,14 +17,25 @@ function Sphere({ gradient, size=110 }: { gradient:string; size?:number }) {
   )
 }
 
-const featured = PRODUCTS.filter(p => p.isNew || p.isSale).slice(0, 4)
+async function getFeatured() {
+  const db = createAdminClient()
+  const { data } = await db
+    .from('products')
+    .select('*, category:categories(name,slug)')
+    .eq('is_active', true)
+    .or('is_featured.eq.true,is_new.eq.true')
+    .order('created_at', { ascending: false })
+    .limit(4)
+  return data || []
+}
 
-export default function HomePage() {
+export default async function HomePage() {
+  const featured = await getFeatured()
+
   return (
     <div>
       {/* HERO */}
       <section style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', textAlign:'center', padding:'100px 24px 60px', position:'relative', overflow:'hidden' }}>
-        {/* Rings */}
         {[700,520,360,220].map((sz,i) => (
           <div key={i} style={{
             position:'absolute', width:sz, height:sz, borderRadius:'50%',
@@ -55,7 +67,7 @@ export default function HomePage() {
             No vendemos chocolates. Creamos universos de sabor.<br />Cada bombón, un planeta. Cada bocado, una constelación.
           </p>
           <div style={{ display:'flex', gap:14, justifyContent:'center', flexWrap:'wrap' }}>
-            <Link href="/catalogo" style={{ background:'linear-gradient(135deg,var(--amber),var(--gold))', color:'var(--obsidian)', padding:'15px 38px', fontFamily:'var(--font-body)', fontSize:14, letterSpacing:3, textTransform:'uppercase', fontWeight:600, textDecoration:'none', transition:'transform .2s' }}>Explorar Creaciones</Link>
+            <TrackedLink href="/catalogo" event="abrir_catalogo" style={{ background:'linear-gradient(135deg,var(--amber),var(--gold))', color:'var(--obsidian)', padding:'15px 38px', fontFamily:'var(--font-body)', fontSize:14, letterSpacing:3, textTransform:'uppercase', fontWeight:600, textDecoration:'none', transition:'transform .2s' }}>Explorar Creaciones</TrackedLink>
             <Link href="/contacto" style={{ background:'transparent', border:'1px solid rgba(200,134,10,0.5)', color:'var(--starlight)', padding:'15px 38px', fontFamily:'var(--font-body)', fontSize:14, letterSpacing:3, textTransform:'uppercase', textDecoration:'none' }}>Contacto</Link>
           </div>
         </div>
@@ -71,35 +83,49 @@ export default function HomePage() {
           <p style={{ fontFamily:'var(--font-body)', fontSize:11, letterSpacing:6, color:'var(--amber)', textTransform:'uppercase', marginBottom:12 }}>✦ Creaciones Destacadas</p>
           <h2 style={{ fontFamily:'var(--font-display)', fontSize:'clamp(1.8rem,3.5vw,3rem)', color:'var(--cream)' }}>Universos de <em style={{ color:'var(--gold)', fontStyle:'italic', fontFamily:'var(--font-body)' }}>Sabor</em></h2>
         </div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(270px,1fr))', gap:22 }}>
-          {featured.map(p => (
-            <div key={p.id} style={{ background:'rgba(10,6,20,0.85)', border:'1px solid rgba(200,134,10,0.16)', overflow:'hidden', transition:'all .35s', cursor:'pointer' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor='rgba(200,134,10,0.55)'; (e.currentTarget as HTMLDivElement).style.transform='translateY(-5px)'; (e.currentTarget as HTMLDivElement).style.boxShadow='0 24px 70px rgba(138,43,226,0.18)' }}
-              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor='rgba(200,134,10,0.16)'; (e.currentTarget as HTMLDivElement).style.transform=''; (e.currentTarget as HTMLDivElement).style.boxShadow='' }}>
-              <Link href={`/producto/${p.slug}`} style={{ textDecoration:'none', display:'block' }}>
-                <div style={{ height:220, display:'flex', alignItems:'center', justifyContent:'center', background:'radial-gradient(circle at 40% 35%,rgba(40,15,5,0.55),rgba(2,0,10,0.92))', position:'relative' }}>
-                  {p.isNew && <span style={{ position:'absolute', top:14, left:14, background:'var(--gold)', color:'var(--obsidian)', padding:'3px 10px', fontFamily:'monospace', fontSize:8, letterSpacing:2, fontWeight:700 }}>NUEVO</span>}
-                  {p.isSale && <span style={{ position:'absolute', top:14, right:14, background:'var(--rose)', color:'white', padding:'3px 10px', fontFamily:'monospace', fontSize:8, letterSpacing:2 }}>OFERTA</span>}
-                  <Sphere gradient={p.sphere} />
+        {featured.length === 0 ? (
+          <div style={{ textAlign:'center', padding:'40px 0', fontFamily:'var(--font-body)', color:'var(--stellar)' }}>
+            Muy pronto nuevas creaciones aquí ✦
+          </div>
+        ) : (
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(270px,1fr))', gap:22 }}>
+            {featured.map((p: any) => {
+              const img = firstImage(p.images)
+              const gradient = fallbackGradient(p.id)
+              const onSale = p.compare_price && Number(p.compare_price) > Number(p.price)
+              return (
+                <div key={p.id} style={{ background:'rgba(10,6,20,0.85)', border:'1px solid rgba(200,134,10,0.16)', overflow:'hidden', transition:'all .35s', cursor:'pointer' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor='rgba(200,134,10,0.55)'; (e.currentTarget as HTMLDivElement).style.transform='translateY(-5px)'; (e.currentTarget as HTMLDivElement).style.boxShadow='0 24px 70px rgba(138,43,226,0.18)' }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor='rgba(200,134,10,0.16)'; (e.currentTarget as HTMLDivElement).style.transform=''; (e.currentTarget as HTMLDivElement).style.boxShadow='' }}>
+                  <Link href={`/producto/${p.slug}`} style={{ textDecoration:'none', display:'block' }}>
+                    <div style={{ height:220, display:'flex', alignItems:'center', justifyContent:'center', background:'radial-gradient(circle at 40% 35%,rgba(40,15,5,0.55),rgba(2,0,10,0.92))', position:'relative', overflow:'hidden' }}>
+                      {p.is_new && <span style={{ position:'absolute', top:14, left:14, background:'var(--gold)', color:'var(--obsidian)', padding:'3px 10px', fontFamily:'monospace', fontSize:8, letterSpacing:2, fontWeight:700, zIndex:2 }}>NUEVO</span>}
+                      {onSale && <span style={{ position:'absolute', top:14, right:14, background:'var(--rose)', color:'white', padding:'3px 10px', fontFamily:'monospace', fontSize:8, letterSpacing:2, zIndex:2 }}>OFERTA</span>}
+                      {img
+                        ? <img src={img} alt={p.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                        : <Sphere gradient={gradient} />
+                      }
+                    </div>
+                    <div style={{ padding:'18px 20px 0' }}>
+                      <p style={{ fontFamily:'var(--font-body)', fontSize:10, letterSpacing:3, color:'var(--amber)', textTransform:'uppercase', marginBottom:7 }}>{p.category?.name || 'MAKANGRU'}</p>
+                      <h3 style={{ fontFamily:'var(--font-display)', fontSize:'1.05rem', color:'var(--cream)', marginBottom:7 }}>{p.name}</h3>
+                      <p style={{ fontFamily:'var(--font-body)', fontSize:12, color:'var(--stellar)', fontStyle:'italic', lineHeight:1.6, marginBottom:14, height:38, overflow:'hidden' }}>{p.tagline}</p>
+                    </div>
+                  </Link>
+                  <div style={{ padding:'0 20px 20px', display:'flex', justifyContent:'space-between', alignItems:'flex-end' }}>
+                    <div>
+                      <div style={{ fontFamily:'var(--font-display)', fontSize:'1.15rem', color:'var(--gold)', fontWeight:700 }}>{fmt(p.price)}</div>
+                      {onSale && <div style={{ fontFamily:'var(--font-body)', fontSize:11, color:'var(--stellar)', textDecoration:'line-through' }}>{fmt(p.compare_price)}</div>}
+                    </div>
+                    <AddToCartBtn product={p} />
+                  </div>
                 </div>
-                <div style={{ padding:'18px 20px 0' }}>
-                  <p style={{ fontFamily:'var(--font-body)', fontSize:10, letterSpacing:3, color:'var(--amber)', textTransform:'uppercase', marginBottom:7 }}>{p.catName}</p>
-                  <h3 style={{ fontFamily:'var(--font-display)', fontSize:'1.05rem', color:'var(--cream)', marginBottom:7 }}>{p.name}</h3>
-                  <p style={{ fontFamily:'var(--font-body)', fontSize:12, color:'var(--stellar)', fontStyle:'italic', lineHeight:1.6, marginBottom:14, height:38, overflow:'hidden' }}>{p.tagline}</p>
-                </div>
-              </Link>
-              <div style={{ padding:'0 20px 20px', display:'flex', justifyContent:'space-between', alignItems:'flex-end' }}>
-                <div>
-                  <div style={{ fontFamily:'var(--font-display)', fontSize:'1.15rem', color:'var(--gold)', fontWeight:700 }}>{fmt(p.price)}</div>
-                  {p.oldPrice && <div style={{ fontFamily:'var(--font-body)', fontSize:11, color:'var(--stellar)', textDecoration:'line-through' }}>{fmt(p.oldPrice)}</div>}
-                </div>
-                <AddToCartBtn product={p} />
-              </div>
-            </div>
-          ))}
-        </div>
+              )
+            })}
+          </div>
+        )}
         <div style={{ textAlign:'center', marginTop:44 }}>
-          <Link href="/catalogo" style={{ border:'1px solid rgba(200,134,10,0.5)', color:'var(--gold)', padding:'13px 34px', fontFamily:'var(--font-body)', fontSize:13, letterSpacing:3, textTransform:'uppercase', textDecoration:'none' }}>Ver Todo el Catálogo →</Link>
+          <TrackedLink href="/catalogo" event="abrir_catalogo" style={{ border:'1px solid rgba(200,134,10,0.5)', color:'var(--gold)', padding:'13px 34px', fontFamily:'var(--font-body)', fontSize:13, letterSpacing:3, textTransform:'uppercase', textDecoration:'none' }}>Ver Todo el Catálogo →</TrackedLink>
         </div>
       </section>
 
