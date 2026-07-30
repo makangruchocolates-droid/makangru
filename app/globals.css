@@ -26,3 +26,4 @@ input,textarea,select{font-family:var(--font-body)}
 .animate-float{animation:float 4s ease-in-out infinite}
 .animate-spin-slow{animation:spin .8s linear infinite}
 .page-fade{animation:pfade .55s ease both}
+.featured-product-card:hover{border-color:rgba(200,134,10,.55)!important;transform:translateY(-5px);box-shadow:0 24px 70px rgba(138,43,226,.18)}

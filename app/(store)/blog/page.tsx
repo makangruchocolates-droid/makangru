@@ -16,7 +16,7 @@ export default async function BlogPage() {
         {posts && posts.length > 0 ? (
           <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))', gap:28 }}>
             {posts.map((p:any) => (
-              <div key={p.id} style={{ background:'var(--void)', border:'1px solid rgba(200,134,10,0.15)' }}>
+              <Link key={p.id} href={`/blog/${p.slug}`} style={{ background:'var(--void)', border:'1px solid rgba(200,134,10,0.15)', textDecoration:'none', display:'block' }}>
                 <div style={{ height:200, background:'radial-gradient(circle at 30% 40%,rgba(61,26,10,0.4),var(--cosmos))', display:'flex', alignItems:'center', justifyContent:'center', fontSize:72 }}>
                   {p.cover_image?.startsWith('http') ? <img src={p.cover_image} alt={p.title} style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : p.cover_image||'✦'}
                 </div>
@@ -32,7 +32,7 @@ export default async function BlogPage() {
                     <span style={{ fontFamily:'var(--font-body)', fontSize:13, color:'var(--amber)' }}>Leer →</span>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (

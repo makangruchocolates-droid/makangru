@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
-import { createPreference } from '@/lib/mercadopago/client'
 import { FALLBACK_SHIPPING_ZONES, fallbackProductByCartIdentity } from '@/lib/commerce/catalog'
 import { rateLimit, requestIp } from '@/lib/security/rateLimit'
 
@@ -109,6 +108,7 @@ export async function POST(req: NextRequest) {
     const orderNumber = `MAKA-${new Date().getFullYear()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`
     const { data: order, error: orderError } = await db.from('orders').insert({
       order_number:orderNumber, customer_id:customerId, status:'pending', payment_status:'pending',
+      payment_method:'transfer',
       subtotal, discount_amount:discountAmount, shipping_amount:shippingAmount, total,
       coupon_id:couponId, coupon_code:couponCode,
       shipping_zone_id:UUID.test(String(shippingZone.id)) ? shippingZone.id : null,
@@ -129,10 +129,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No se pudo crear el detalle de la orden' }, { status: 500 })
     }
 
-    const preference = await createPreference({ customer, orderId:order.id, total })
-    await db.from('orders').update({ mp_preference_id:preference.id }).eq('id', order.id)
-    return NextResponse.json({ init_point:preference.init_point, sandbox_init_point:preference.sandbox_init_point, order_id:order.id, order_number:orderNumber })
+    return NextResponse.json({ order_id: order.id, order_number: orderNumber, total })
   } catch (error: any) {
-    return NextResponse.json({ error:error?.message || 'Solicitud inválida' }, { status:400 })
+    return NextResponse.json({ error: error?.message || 'Solicitud inválida' }, { status: 400 })
   }
 }

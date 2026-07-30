@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
 function configuredAdminEmails() {
-  return (process.env.ADMIN_EMAILS || '')
+  return (process.env.ADMIN_EMAILS || 'makangruchocolates@gmail.com')
     .split(',')
     .map(email => email.trim().toLowerCase())
     .filter(Boolean)
@@ -12,7 +12,7 @@ function configuredAdminEmails() {
 export function isAllowedAdminEmail(email?: string | null) {
   if (!email) return false
   const allowed = configuredAdminEmails()
-  return allowed.length === 0 || allowed.includes(email.toLowerCase())
+  return allowed.includes(email.toLowerCase())
 }
 
 export async function getAdminUser() {

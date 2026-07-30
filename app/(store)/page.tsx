@@ -100,9 +100,7 @@ export default async function HomePage() {
               const gradient = fallbackGradient(p.id)
               const onSale = p.compare_price && Number(p.compare_price) > Number(p.price)
               return (
-                <div key={p.id} style={{ background:'rgba(10,6,20,0.85)', border:'1px solid rgba(200,134,10,0.16)', overflow:'hidden', transition:'all .35s', cursor:'pointer' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor='rgba(200,134,10,0.55)'; (e.currentTarget as HTMLDivElement).style.transform='translateY(-5px)'; (e.currentTarget as HTMLDivElement).style.boxShadow='0 24px 70px rgba(138,43,226,0.18)' }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor='rgba(200,134,10,0.16)'; (e.currentTarget as HTMLDivElement).style.transform=''; (e.currentTarget as HTMLDivElement).style.boxShadow='' }}>
+                <div key={p.id} className="featured-product-card" style={{ background:'rgba(10,6,20,0.85)', border:'1px solid rgba(200,134,10,0.16)', overflow:'hidden', transition:'all .35s', cursor:'pointer' }}>
                   <Link href={`/producto/${p.slug}`} style={{ textDecoration:'none', display:'block' }}>
                     <div style={{ height:220, display:'flex', alignItems:'center', justifyContent:'center', background:'radial-gradient(circle at 40% 35%,rgba(40,15,5,0.55),rgba(2,0,10,0.92))', position:'relative', overflow:'hidden' }}>
                       {p.is_new && <span style={{ position:'absolute', top:14, left:14, background:'var(--gold)', color:'var(--obsidian)', padding:'3px 10px', fontFamily:'monospace', fontSize:8, letterSpacing:2, fontWeight:700, zIndex:2 }}>NUEVO</span>}
