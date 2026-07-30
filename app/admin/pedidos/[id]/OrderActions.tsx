@@ -14,8 +14,17 @@ export default function OrderActions({ order }: { order: any }) {
   const [notes, setNotes] = useState(order.admin_notes || '')
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState<{text:string,ok:boolean}|null>(null)
+  const [confirmingPayment, setConfirmingPayment] = useState(false)
 
   const toast = (text:string,ok=true)=>{ setMsg({text,ok}); setTimeout(()=>setMsg(null),3000) }
+
+  const confirmPayment = async () => {
+    setConfirmingPayment(true)
+    const r = await fetch(`/api/admin/orders/${order.id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ payment_status:'paid', paid_at: new Date().toISOString() }) })
+    setConfirmingPayment(false)
+    if (r.ok) { toast('✦ Pago confirmado'); router.refresh() }
+    else toast('⚠ Error al confirmar el pago', false)
+  }
 
   const save = async () => {
     setSaving(true)
@@ -49,6 +58,16 @@ export default function OrderActions({ order }: { order: any }) {
   return (
     <div>
       {msg && <div style={{ background:msg.ok?'rgba(74,155,142,0.1)':'rgba(212,114,106,0.1)', border:`1px solid ${msg.ok?'rgba(74,155,142,0.4)':'rgba(212,114,106,0.4)'}`, color:msg.ok?'#4A9B8E':'#D4726A', padding:'10px 14px', marginBottom:14, fontFamily:'Georgia,serif', fontSize:13 }}>{msg.text}</div>}
+
+      {order.payment_method === 'transfer' && order.payment_status !== 'paid' && (
+        <div style={{ background:'rgba(139,124,248,0.08)', border:'1px solid rgba(139,124,248,0.3)', padding:18, marginBottom:16 }}>
+          <p style={{ fontSize:9, letterSpacing:3, color:'#8B7CF8', textTransform:'uppercase', marginBottom:8, fontFamily:'Georgia,serif' }}>🏦 Pago por Transferencia — Pendiente</p>
+          <p style={{ fontFamily:'Georgia,serif', fontSize:13, color:'#F5E6C8', marginBottom:14, lineHeight:1.6 }}>Este cliente eligió pagar por transferencia. Verifica que el comprobante haya llegado (WhatsApp o email) antes de confirmar.</p>
+          <button onClick={confirmPayment} disabled={confirmingPayment} style={{ background:'linear-gradient(135deg,#4A9B8E,#6BBDB0)', border:'none', color:'#02000A', padding:'10px 22px', cursor:confirmingPayment?'not-allowed':'pointer', fontFamily:'Georgia,serif', fontWeight:700, fontSize:13, opacity:confirmingPayment?0.7:1 }}>
+            {confirmingPayment ? 'Confirmando...' : '✓ Confirmar pago recibido'}
+          </button>
+        </div>
+      )}
 
       <div style={{ background:'rgba(10,6,20,0.85)', border:'1px solid rgba(200,134,10,0.18)', padding:22, marginBottom:16 }}>
         <p style={{ fontSize:9, letterSpacing:3, color:'#C8860A', textTransform:'uppercase', marginBottom:16, fontFamily:'Georgia,serif' }}>Progreso del Pedido</p>

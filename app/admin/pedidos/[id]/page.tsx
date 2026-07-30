@@ -18,7 +18,17 @@ export default async function PedidoDetalle({ params }: { params: Promise<{ id: 
           <h1 style={{ fontFamily:'Cinzel,Georgia,serif', fontSize:'2rem', color:'#FDF6E8', marginBottom:4 }}>{o.order_number}</h1>
           <p style={{ color:'#A89070', fontFamily:'Georgia,serif', fontSize:13 }}>{new Date(o.created_at).toLocaleDateString('es-CL', { weekday:'long', year:'numeric', month:'long', day:'numeric' })}</p>
         </div>
-        <span style={{ background:`${SC[o.status]||'#A89070'}22`, color:SC[o.status]||'#A89070', padding:'8px 18px', fontFamily:'monospace', fontSize:13 }}>{SL[o.status]||o.status}</span>
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:8 }}>
+          <span style={{ background:`${SC[o.status]||'#A89070'}22`, color:SC[o.status]||'#A89070', padding:'8px 18px', fontFamily:'monospace', fontSize:13 }}>{SL[o.status]||o.status}</span>
+          <div style={{ display:'flex', gap:6 }}>
+            <span style={{ background: o.payment_method==='transfer' ? 'rgba(139,124,248,0.15)' : 'rgba(74,155,142,0.15)', color: o.payment_method==='transfer' ? '#8B7CF8' : '#4A9B8E', padding:'3px 10px', fontFamily:'monospace', fontSize:10 }}>
+              {o.payment_method==='transfer' ? '🏦 Transferencia' : '💳 Mercado Pago'}
+            </span>
+            <span style={{ background: o.payment_status==='paid' ? 'rgba(74,155,142,0.15)' : 'rgba(212,114,106,0.15)', color: o.payment_status==='paid' ? '#4A9B8E' : '#D4726A', padding:'3px 10px', fontFamily:'monospace', fontSize:10 }}>
+              {o.payment_status==='paid' ? '✓ Pagado' : '⏳ Pago pendiente'}
+            </span>
+          </div>
+        </div>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:18, marginBottom:18 }}>
         <div style={{ background:'rgba(10,6,20,0.85)', border:'1px solid rgba(200,134,10,0.18)', padding:22 }}>

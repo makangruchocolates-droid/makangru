@@ -11,7 +11,7 @@ export async function GET() {
   if (unauthorized) return unauthorized
   const db = createAdminClient()
   // Try site_settings table first, fall back gracefully
-  const { data, error } = await db.from('site_settings').select('id,site_name,site_tagline,site_description,logo_url,favicon_url,contact_email,contact_phone,contact_address,contact_city,instagram_url,facebook_url,tiktok_url,youtube_url,pinterest_url,whatsapp_number,whatsapp_message,mp_public_key,banner_enabled,banner_text,banner_color,business_hours,meta_title,meta_description,og_image_url').limit(1).maybeSingle()
+  const { data, error } = await db.from('site_settings').select('id,site_name,site_tagline,site_description,logo_url,favicon_url,contact_email,contact_phone,contact_address,contact_city,instagram_url,facebook_url,tiktok_url,youtube_url,pinterest_url,whatsapp_number,whatsapp_message,mp_public_key,transfer_bank_name,transfer_account_type,transfer_account_holder,transfer_account_rut,transfer_account_number,transfer_email,transfer_instructions,banner_enabled,banner_text,banner_color,business_hours,meta_title,meta_description,og_image_url').limit(1).maybeSingle()
   if (error && error.code !== 'PGRST116') {
     // Table might not exist yet — return empty defaults
     return NextResponse.json({ data: null })

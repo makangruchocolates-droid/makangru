@@ -29,6 +29,13 @@ const DEFAULTS = {
   whatsapp_number: '',
   whatsapp_message: 'Hola MAKANGRU ✦ me gustaría hacer un pedido',
   mp_public_key: '',
+  transfer_bank_name: '',
+  transfer_account_type: '',
+  transfer_account_holder: '',
+  transfer_account_rut: '',
+  transfer_account_number: '',
+  transfer_email: '',
+  transfer_instructions: '',
   // Banners
   banner_enabled: false,
   banner_text: '',
@@ -200,6 +207,22 @@ export default function AjustesPage() {
             </div>
             <div style={G}><label style={L}>Public Key (opcional)</label><input style={I} value={form.mp_public_key} onChange={e => set('mp_public_key', e.target.value)} placeholder="APP_USR-..." /></div>
             <p style={{ color:'#A89070', fontFamily:'Georgia,serif', fontSize:12 }}>El Access Token nunca se guarda ni se muestra aquí. Debe existir únicamente como <code>MP_ACCESS_TOKEN</code> cifrado en Vercel.</p>
+          </div>
+
+          <div style={CARD}>
+            <div style={TITLE}>🏦 Transferencia Bancaria</div>
+            <div style={{ background: 'rgba(74,155,142,0.08)', border: '1px solid rgba(74,155,142,0.2)', padding: '10px 14px', marginBottom: 18, fontFamily: 'Georgia,serif', fontSize: 12, color: '#4A9B8E' }}>
+              ✦ Solo tu referencia interna — nunca se muestra públicamente. El cliente pide los datos por WhatsApp y tú se los envías.
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div style={G}><label style={L}>Banco</label><input style={I} value={form.transfer_bank_name} onChange={e => set('transfer_bank_name', e.target.value)} placeholder="Banco Estado, Santander..." /></div>
+              <div style={G}><label style={L}>Tipo de cuenta</label><input style={I} value={form.transfer_account_type} onChange={e => set('transfer_account_type', e.target.value)} placeholder="Cuenta Corriente, Vista..." /></div>
+              <div style={G}><label style={L}>Titular</label><input style={I} value={form.transfer_account_holder} onChange={e => set('transfer_account_holder', e.target.value)} placeholder="MAKANGRU SpA" /></div>
+              <div style={G}><label style={L}>RUT</label><input style={I} value={form.transfer_account_rut} onChange={e => set('transfer_account_rut', e.target.value)} placeholder="77.123.456-7" /></div>
+              <div style={G}><label style={L}>N° de cuenta</label><input style={I} value={form.transfer_account_number} onChange={e => set('transfer_account_number', e.target.value)} /></div>
+              <div style={G}><label style={L}>Email para comprobante</label><input style={I} type="email" value={form.transfer_email} onChange={e => set('transfer_email', e.target.value)} placeholder="pagos@makangru.cl" /></div>
+              <div style={{ ...G, gridColumn: '1/-1' }}><label style={L}>Instrucciones adicionales (opcional)</label><textarea style={{ ...I, height: 64, resize: 'vertical' }} value={form.transfer_instructions} onChange={e => set('transfer_instructions', e.target.value)} placeholder="Ej: Usa tu número de pedido como referencia." /></div>
+            </div>
           </div>
         </div>
       )}

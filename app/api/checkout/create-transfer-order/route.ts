@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { rateLimit, requestIp } from '@/lib/security/rateLimit'
 import { buildValidatedCheckout, upsertCustomer, generateOrderNumber } from '@/lib/commerce/validateCheckout'
-import { createPreference } from '@/lib/mercadopago/client'
 
 export async function POST(req: NextRequest) {
   const limited = rateLimit(`checkout:${requestIp(req)}`, 8, 10 * 60_000)
@@ -17,7 +16,7 @@ export async function POST(req: NextRequest) {
 
     const { data: order, error: orderError } = await db.from('orders').insert({
       order_number: orderNumber, customer_id: customerId, status: 'pending', payment_status: 'pending',
-      payment_method: 'mercadopago',
+      payment_method: 'transfer',
       subtotal, discount_amount: discountAmount, shipping_amount: shippingAmount, total,
       coupon_id: couponId, coupon_code: couponCode,
       shipping_zone_id: /^[0-9a-f-]{36}$/i.test(String(shippingZone.id)) ? shippingZone.id : null,
@@ -38,8 +37,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No se pudo crear el detalle de la orden' }, { status: 500 })
     }
 
-    const preference = await createPreference({ customer, orderId: order.id, total })
-    return NextResponse.json({ order_id: order.id, order_number: orderNumber, total, init_point: preference.init_point, sandbox_init_point: preference.sandbox_init_point })
+    return NextResponse.json({ order_id: order.id, order_number: orderNumber, total })
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'Solicitud inválida' }, { status: 400 })
   }

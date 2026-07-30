@@ -24,6 +24,7 @@ export default function CheckoutPage(){
   const [zone,setZone]=useState<any>(null)
   const [date,setDate]=useState('')
   const [form,setForm]=useState({first_name:'',last_name:'',email:'',phone:'',address_line1:'',city:'',state:'',postal_code:'',notes:''})
+  const [payMethod,setPayMethod]=useState<'mercadopago'|'transfer'>('mercadopago')
 
   useEffect(()=>{
     setHyd(true)
@@ -44,11 +45,19 @@ export default function CheckoutPage(){
   const pay=async()=>{
     setLoading(true);setError(null)
     try{
+      if(payMethod==='transfer'){
+        const r=await fetch('/api/checkout/create-transfer-order',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({items,customer:form,coupon_code:coupon?.code,shipping_zone_id:zone?.id,shipping_zone_name:zone?.name,shipping_amount:shipping,delivery_date:date||null})})
+        const d=await r.json()
+        if(!r.ok) throw new Error(d.error)
+        router.push(`/checkout/success?method=transfer&order_number=${d.order_number}&total=${d.total}`)
+        return
+      }
       const r=await fetch('/api/checkout/create-preference',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({items,customer:form,coupon_code:coupon?.code,shipping_zone_id:zone?.id,shipping_zone_name:zone?.name,shipping_amount:shipping,delivery_date:date||null})})
       const d=await r.json()
       if(!r.ok) throw new Error(d.error)
-      router.push(`/checkout/success?external_reference=${encodeURIComponent(d.order_number)}`)
+      window.location.href=d.sandbox_init_point||d.init_point
     }catch(e:any){setError(e.message);setLoading(false)}
   }
 
@@ -154,14 +163,26 @@ export default function CheckoutPage(){
                 </div>
               </div>
             </div>
+
+            <p style={{fontFamily:'var(--font-body)',fontSize:11,letterSpacing:3,color:'var(--amber)',textTransform:'uppercase',marginBottom:12}}>Método de Pago</p>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:22}}>
+              <button onClick={()=>setPayMethod('mercadopago')} style={{background:payMethod==='mercadopago'?'rgba(200,134,10,.12)':'rgba(10,6,20,.85)',border:payMethod==='mercadopago'?'1px solid var(--amber)':'1px solid rgba(200,134,10,.18)',padding:'16px 14px',cursor:'pointer',textAlign:'left'}}>
+                <div style={{fontFamily:'var(--font-display)',fontSize:'0.9rem',color:payMethod==='mercadopago'?'var(--gold)':'var(--cream)',marginBottom:4}}>💳 Mercado Pago</div>
+                <div style={{fontFamily:'var(--font-body)',fontSize:11,color:'var(--stellar)'}}>Tarjetas, débito, efectivo</div>
+              </button>
+              <button onClick={()=>setPayMethod('transfer')} style={{background:payMethod==='transfer'?'rgba(200,134,10,.12)':'rgba(10,6,20,.85)',border:payMethod==='transfer'?'1px solid var(--amber)':'1px solid rgba(200,134,10,.18)',padding:'16px 14px',cursor:'pointer',textAlign:'left'}}>
+                <div style={{fontFamily:'var(--font-display)',fontSize:'0.9rem',color:payMethod==='transfer'?'var(--gold)':'var(--cream)',marginBottom:4}}>🏦 Transferencia Bancaria</div>
+                <div style={{fontFamily:'var(--font-body)',fontSize:11,color:'var(--stellar)'}}>Te enviamos los datos</div>
+              </button>
+            </div>
             {error&&<div style={{background:'rgba(212,114,106,.1)',border:'1px solid rgba(212,114,106,.4)',color:'var(--rose)',padding:'11px 14px',marginBottom:18,fontFamily:'var(--font-body)',fontSize:14}}>⚠ {error}</div>}
             <div style={{display:'flex',gap:12}}>
               <button onClick={()=>setStep(2)} style={{background:'none',border:'1px solid rgba(200,134,10,.3)',color:'var(--stellar)',cursor:'pointer',padding:'13px 22px',fontFamily:'var(--font-body)',fontSize:13}}>← Atrás</button>
               <button onClick={pay} disabled={loading} style={{flex:1,background:'linear-gradient(135deg,var(--amber),var(--gold))',border:'none',color:'var(--obsidian)',cursor:loading?'not-allowed':'pointer',padding:'13px',fontFamily:'var(--font-body)',fontSize:14,letterSpacing:3,textTransform:'uppercase',fontWeight:600,display:'flex',alignItems:'center',justifyContent:'center',gap:10}}>
-                {loading?<><div style={{width:18,height:18,borderRadius:'50%',border:'2px solid rgba(10,8,6,.3)',borderTop:'2px solid #0A0806',animation:'spin .8s linear infinite'}}/>Procesando...</>:'Confirmar Pedido ✦'}
+                {loading?<><div style={{width:18,height:18,borderRadius:'50%',border:'2px solid rgba(10,8,6,.3)',borderTop:'2px solid #0A0806',animation:'spin .8s linear infinite'}}/>Procesando...</>:payMethod==='transfer'?'Confirmar Pedido ✦':'Pagar con Mercado Pago ✦'}
               </button>
             </div>
-            <p style={{marginTop:12,textAlign:'center',fontFamily:'var(--font-body)',fontSize:12,color:'var(--stellar)'}}>Coordinaremos los datos de transferencia y la entrega por WhatsApp.</p>
+            <p style={{marginTop:12,textAlign:'center',fontFamily:'var(--font-body)',fontSize:12,color:'var(--stellar)'}}>{payMethod==='transfer'?'🏦 Recibirás los datos bancarios al confirmar':'🔒 Pago 100% seguro · Mercado Pago · SSL'}</p>
           </div>
         )}
       </div>

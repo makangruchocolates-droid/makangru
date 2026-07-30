@@ -33,7 +33,12 @@ export default async function AdminPedidos({ searchParams }: { searchParams: Pro
                 <td style={{ padding:'11px 13px', fontFamily:'monospace', fontSize:12, color:'#C8860A' }}>{o.order_number}</td>
                 <td style={{ padding:'11px 13px' }}><div style={{ fontFamily:'Georgia,serif', fontSize:13, color:'#F5E6C8' }}>{o.customer_name}</div><div style={{ fontFamily:'Georgia,serif', fontSize:11, color:'#A89070' }}>{o.customer_email}</div></td>
                 <td style={{ padding:'11px 13px', fontFamily:'Cinzel,Georgia,serif', fontSize:13, color:'#E8B84B', fontWeight:700 }}>{fmt(o.total)}</td>
-                <td style={{ padding:'11px 13px' }}><span style={{ background:`${SC[o.status]||'#A89070'}22`, color:SC[o.status]||'#A89070', padding:'3px 9px', fontFamily:'monospace', fontSize:10 }}>{SL[o.status]||o.status}</span></td>
+                <td style={{ padding:'11px 13px' }}>
+                  <span style={{ background:`${SC[o.status]||'#A89070'}22`, color:SC[o.status]||'#A89070', padding:'3px 9px', fontFamily:'monospace', fontSize:10 }}>{SL[o.status]||o.status}</span>
+                  {o.payment_method==='transfer' && o.payment_status!=='paid' && (
+                    <span style={{ background:'rgba(139,124,248,0.18)', color:'#8B7CF8', padding:'3px 9px', fontFamily:'monospace', fontSize:10, marginLeft:6 }}>🏦 Confirmar pago</span>
+                  )}
+                </td>
                 <td style={{ padding:'11px 13px', fontFamily:'Georgia,serif', fontSize:12, color:o.delivery_date?'#4A9B8E':'#A89070' }}>{o.delivery_date?new Date(o.delivery_date+'T12:00:00').toLocaleDateString('es-CL'):'—'}</td>
                 <td style={{ padding:'11px 13px', fontFamily:'Georgia,serif', fontSize:12, color:'#A89070' }}>{new Date(o.created_at).toLocaleDateString('es-CL')}</td>
                 <td style={{ padding:'11px 13px' }}><Link href={`/admin/pedidos/${o.id}`} style={{ color:'#C8860A', textDecoration:'none', fontFamily:'Georgia,serif', fontSize:13 }}>Ver →</Link></td>
