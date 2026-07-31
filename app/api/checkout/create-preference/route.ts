@@ -38,8 +38,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No se pudo crear el detalle de la orden' }, { status: 500 })
     }
 
-    const preference = await createPreference({ customer, orderId: order.id, total })
-    return NextResponse.json({ order_id: order.id, order_number: orderNumber, total, init_point: preference.init_point, sandbox_init_point: preference.sandbox_init_point })
+    try {
+      const preference = await createPreference({ customer, orderId: order.id, total })
+      return NextResponse.json({ order_id: order.id, order_number: orderNumber, total, init_point: preference.init_point, sandbox_init_point: preference.sandbox_init_point })
+    } catch {
+      await db.from('order_items').delete().eq('order_id', order.id)
+      await db.from('orders').delete().eq('id', order.id)
+      return NextResponse.json({ error: 'Mercado Pago no está disponible. Intenta con transferencia o vuelve más tarde.' }, { status: 503 })
+    }
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'Solicitud inválida' }, { status: 400 })
   }
