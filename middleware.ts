@@ -14,4 +14,8 @@ export async function middleware(request: NextRequest) {
   await supabase.auth.getUser()
   return response
 }
-export const config = { matcher:['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'] }
+// Acotado solo a /admin y /api/admin — la tienda pública (portada, catálogo,
+// fichas de producto, checkout) no necesita sesión y nunca debe depender de
+// que Supabase Auth responda rápido. Un problema de auth ahora solo afecta
+// al panel admin, jamás a la tienda que ven los clientes.
+export const config = { matcher:['/admin/:path*', '/api/admin/:path*'] }
